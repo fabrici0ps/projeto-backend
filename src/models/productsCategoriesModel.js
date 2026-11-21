@@ -8,12 +8,14 @@ ProductsCategories.init(
         productId: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            field: "product_id"
+            field: "product_id",
+            onDelete: "CASCADE"
         },
         categoryId: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            field: "category_id"
+            field: "category_id",
+            onDelete: "CASCADE"
         },
     },
     {

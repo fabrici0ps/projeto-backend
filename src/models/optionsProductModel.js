@@ -18,15 +18,15 @@ OptionsProduct.init(
             defaultValue: 'square'
         },
         radius: {
-            type: DataTypes.INTEGER,
-            defaultValue: 0
+            type: DataTypes.STRING,
+            defaultValue: "0px"
         },
         type: {
             type: DataTypes.ENUM('text', 'color'),
             defaultValue: 'text'
         },
         values: {
-            type: DataTypes.STRING,
+            type: DataTypes.JSON,
             allowNull: false
         },
     },
