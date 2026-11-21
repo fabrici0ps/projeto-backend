@@ -1,5 +1,32 @@
 import bcrypt from "bcrypt"
 import User from "../models/userModel.js"
+import jwt from "jsonwebtoken"
+
+const generateToken = async (req, res) => {
+    const { email, password } = req.body
+    
+    try {
+        const user = await User.findOne({ where: { email: email } })
+
+        if(!user) return res.status(404).json({ msg: "Usuário não encontrado" })
+
+        const matchPassword = await bcrypt.compare(password, user.password)
+
+        if(!matchPassword) return res.status(400).json({ msg: "Senha incorreta" })
+        
+            const payload = {
+                id: user.id,
+                firstname: user.firstname,
+                email: email
+            }
+
+        const token = jwt.sign(payload, process.env.APP_SECRET_KEY, { expiresIn: "1h" })
+
+        return res.status(200).json({ token: `Bearer ${token}` })
+    } catch (error) {
+        return res.status(400).json({ msg: "Os dados fornecidos estão incorretos", error: error.message })
+    }
+}
 
 const findById = async (req, res) => {    
     try {
@@ -59,5 +86,6 @@ export {
     findById,
     create,
     update,
-    remove
+    remove,
+    generateToken
 }
