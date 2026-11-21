@@ -20,9 +20,13 @@ const generateToken = async (req, res) => {
                 email: email
             }
 
-        const token = jwt.sign(payload, process.env.APP_SECRET_KEY, { expiresIn: "1h" })
+        const token = jwt.sign(
+            payload, 
+            process.env.APP_SECRET_KEY, 
+            { expiresIn: "1h" }
+        )
 
-        return res.status(200).json({ token: `Bearer ${token}` })
+        return res.status(200).json({token: token})
     } catch (error) {
         return res.status(400).json({ msg: "Os dados fornecidos estão incorretos", error: error.message })
     }
@@ -34,6 +38,9 @@ const findById = async (req, res) => {
             {
                 attributes: ['id', 'firstname', 'surname', 'email']
             })
+
+        if(!user) return res.status(404).json({ msg: "Usuário não encontrado" })
+            
         return res.status(200).json({ user })
         
     } catch (error) {
@@ -47,7 +54,11 @@ const create = async (req, res) => {
         body.password = await bcrypt.hash(body.password, 10)
 
         const user = await User.create(body)
-        return res.status(201).json({ user })
+
+        const userResponse = user.toJSON()
+        delete userResponse.password
+
+        return res.status(201).json({ user: userResponse })
         
     } catch (error) {
         return res.status(400).json({ msg: "Dados enviados incorretos", error: error.message })
@@ -60,9 +71,9 @@ const update = async (req, res) => {
 
         if(!user) return res.status(404).json({ msg: "Usuário não encontrado" })
 
-        const { name, email, password } = req.body
+        const { firstname, surname, email } = req.body
 
-        await user.update({ name, email, password })
+        await user.update({ firstname, surname, email })
 
         return res.status(204).end()
     } catch (error) {
@@ -73,6 +84,8 @@ const update = async (req, res) => {
 const remove = async (req, res) => {
     try {
         const user = await User.findByPk(req.params.id)
+
+        if(!user) return res.status(404).json({ msg: "Usuário não encontrado" })
 
         await user.destroy()
         

@@ -6,6 +6,17 @@ const search = async (req, res) => {
     const fields = req.query.fields
     const use_in_menu = req.query.use_in_menu
 
+    if (
+        !Number.isInteger(limit) ||
+        (limit !== -1 && limit <= 0) ||
+        !Number.isInteger(page) ||
+        page <= 0
+    ) {
+        return res.status(400).json({
+            msg: "Parâmetros de paginação inválidos"
+        })
+    }
+
     const offset = limit === -1 ? undefined : (page - 1) * limit
 
     const attributes = fields
@@ -45,7 +56,7 @@ const findById = async (req, res) => {
 
         return res.status(200).json(category)
     } catch (error) {
-        return res.json({ error: error.message })
+        return res.status(404).json({ error: error.message })
     }
 }
 
@@ -80,6 +91,8 @@ const update = async (req, res) => {
 const remove = async (req, res) => {
     try {
         const category = await Category.findByPk(req.params.id)
+
+        if(!category) return res.status(404).json({ msg: "Categoria não encontrada" })
 
         await category.destroy()
         

@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken"
 
 const authMiddleware = async (req, res, next) => {
-    const authorization = req.headers["authorization"]
+    const authorization = req.headers.authorization
 
     if (!authorization) {
         return res.status(401).json({ msg: "Token ausente" })
@@ -10,7 +10,9 @@ const authMiddleware = async (req, res, next) => {
     const [bearer, token] = authorization.split(" ")
 
     if (bearer !== "Bearer" || !token) {
-        return res.status(401).json({ msg: "Formato de token inválido" })
+        return res.status(401).json({
+            msg: "Formato de token inválido"
+        })
     }
 
     try {
